@@ -1,30 +1,24 @@
 const { GraphQLServer } = require('graphql-yoga')
-
-let links = [{
-    id: 'link-0',
-    url: 'www.howtographql.com',
-    description: 'Full tutorial for GraphQL'
-}]
-
-let idCount = links.length
+const { Prisma } = require('prisma-binding')
 
 // The actual implementation of the GraphQL schema
 const resolvers = {
     Query: {
-        info: () => 'This is a API of a Hackernews Clone!',
-        feed: () => links,
+        info: () => `This is the API of a Hackernews Clone`,
+        feed: (root, args, context, info) => {
+            return context.db.query.links({}, info)
+        },
     },
     Mutation: {
-        post: (DeviceRotationRate, args) => {
-            const link = {
-                id: `link-${ idCount++ }`,
-                description: args.description,
-                url: args.url,
-            }
-            links.push(link)
-            return link
-        }
-    }
+        post: (root, args, context, info) => {
+            return context.db.mutation.createLink({
+                data: {
+                    url: args.url,
+                    description: args.description,
+                },
+            }, info)
+        },
+    },
 }
 
 /*
@@ -35,6 +29,15 @@ operations are accepted and how they should be resolved.
 const server = new GraphQLServer({
     typeDefs: './src/schema.graphql',
     resolvers,
+    context: req => ({
+        ...req,
+        db: new Prisma({
+            typeDefs: 'src/generated/prisma.graphql',
+            endpoint: 'https://us1.prisma.sh/evelyn-schmitz-6a9b55/hackernews/dev',
+            secret: 'mysecret123',
+            debug: true,
+        }),
+    }),
 })
 
 server.start(() => console.log('Server is running on http://localhost:4000'))
