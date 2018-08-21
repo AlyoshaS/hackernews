@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/evelyn-schmitz-6a9b55/hackernews/dev
-# timestamp: Tue Aug 21 2018 10:31:31 GMT-0300 (-03)
+# timestamp: Tue Aug 21 2018 13:22:09 GMT-0300 (-03)
 
 type AggregateLink {
   count: Int!
